@@ -15,6 +15,7 @@ const nanoid = customAlphabet(alphabet, 7); // 7 characters long
 export const generateShortCode = () => nanoid();
 
 export const isValidShortCode = (code) => {
+  console.log("Validating short code:", code);
   const regex = new RegExp(`^[${alphabet}]{6,10}$`);
   return regex.test(code);
 };

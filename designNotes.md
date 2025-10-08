@@ -163,7 +163,8 @@ e.g {
 
 }
 
-Actions: describe what happened in our app. they are plain javascript objects with type and optional payload
+Actions: describe what happened in our app. they are plain javascript objects with type and optional payload.
+(Events that happened)
 
 const ADD_URL="ADD_URL";
 
@@ -172,8 +173,53 @@ const addUrlAction={
   payload:{id:1, longUrl:"https://longurllll.com", shortCode:'ex1"}
 };
 
-Reducers: specify how the state changes in response to an action. pure functions, no side effects, no api calls
+Action types are just STRING CONSTANTS - labels for messages. Here we use 3 for one process:
+export const CREATE_URL_REQUEST = 'CREATE_URL_REQUEST';  // "Starting..."
+export const CREATE_URL_SUCCESS = 'CREATE_URL_SUCCESS';  // "Done!"
+export const CREATE_URL_FAILURE = 'CREATE_URL_FAILURE';  // "Error!"
 
+This 3 actions shows different ui:
+REQUEST → Show loading spinner
+SUCCESS → Hide spinner, show data
+FAILURE → Hide spinner, show error
+
+So whenever user clicks, first we immediately dispatch CREATE_URL_REQUEST type action, in the meanwhile we call the api, get data, pass it in the payload in CREATE_URL_SUCCESS action type and dispatch it. In case of error we dispatch CREATE_URL_FAILURE action type
+
+Action Creator (A Function That Creates Messages)
+
+// Instead of writing the message manually every time:
+dispatch({ type: 'CREATE_URL_REQUEST' });  // Repetitive!
+
+// We create a function to do it:
+export const createShortUrl = (longUrl) => {
+  return async (dispatch) => {
+    // 1. Send "Starting" message
+    dispatch({ type: CREATE_URL_REQUEST });
+    
+    try {
+      // 2. Do the actual work (API call)
+      const response = await api.createShortUrl(longUrl);
+      
+      // 3. Send "Success" message with data
+      dispatch({ 
+        type: CREATE_URL_SUCCESS, 
+        payload: response.data 
+      });
+    } catch (error) {
+      // 4. Send "Failed" message with error
+      dispatch({ 
+        type: CREATE_URL_FAILURE, 
+        payload: error.message 
+      });
+    }
+  };
+};
+
+
+
+
+Reducers: specify how the state changes in response to an action. pure functions, no side effects, no api calls
+So they take in initial state, the action that took place, and based on the action update the state in the store
 
 const initialState = {
   urls: []
@@ -190,3 +236,71 @@ const initialState = {
           return state;
       }
   }
+
+
+Spread operator ...state is very important. we never do direct manipulation of state, instead we use { ...state, loading: false } this way we only add new data to the old data and not lose data
+
+// WITHOUT spread - LOSES data!
+return { loading: false };  
+// Result: { loading: false } - Lost urls, total, error!
+
+// WITH spread - KEEPS everything!
+return { ...state, loading: false };
+// Result: { urls: [...], total: 5, loading: false, error: null }
+
+
+Store is the actual place where all states are maintained
+We create a store, import reducers, middlewares
+while creating store, we pass in reducers as params and also thunk as middleware. thunk allows us for async api calls
+
+Without thunk:
+javascript// You can only dispatch plain objects ❌
+dispatch({ type: 'ADD_URL', payload: url });
+
+With thunk:
+javascript// You can dispatch FUNCTIONS that do async stuff ✅
+dispatch(async (dispatch) => {
+  const data = await fetchFromAPI();
+  dispatch({ type: 'SUCCESS', payload: data });
+});
+
+
+the flow: 
+
+Component dispatches action
+    ↓
+Action goes to reducer
+    ↓
+Reducer updates store
+    ↓
+Component re-renders with new data
+
+
+two imp hooks defined by redux:
+useSelector: this is used to read or get data from store
+useDispatch: we use this to dipatch actions
+
+
+import { useSelector } from 'react-redux';
+
+function UrlList() {
+  // useSelector passes the ENTIRE store to your function
+  const urls = useSelector(state => state.url.urls);
+  //                         ↑             ↑      ↑
+  //                      entire       from     from
+  //                      store     combineR  initial
+  //                                eoucers   State
+  
+  console.log(urls);  // [{ id: 1, shortUrl: 'abc' }, ...]
+
+  How it works:
+
+useSelector subscribes to the store
+
+It "watches" the data you selected
+
+
+When state changes:
+
+Redux compares old value vs new value
+If different → Component re-renders

@@ -6,7 +6,6 @@ import App from './App'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <h1>Hello</h1>
     <App/>
   </StrictMode>
 )

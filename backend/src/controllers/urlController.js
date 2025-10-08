@@ -16,22 +16,25 @@ class urlController {
         if (!longUrl || !validator.isURL(longUrl)){
             return res.status(400).json({ sucess:false ,error: 'Invalid URL provided' });
         }
-
+        console.log("Long URL:", longUrl);
          // Generate or use custom short code
         let shortCode = customCode || generateShortCode();
-
+        console.log("Generated short code:", shortCode);
         // Validate custom code if provided
         if (customCode){
+            console.log("here")
             if (customCode.length > 10 || customCode.length < 4){
+                console.log("here nested")
                 return res.status(400).json({ success: false, error: 'Custom code must be between 4 and 10 characters' });
             }
-        
+        console.log("Custom code:", customCode);
         // Check if custom code already exists
-        const existing = await dbService.getUrlByShortCode(customCode);
+        const existing = await dbService.getUrlbyShortCode(customCode);
         if (existing) {
             return res.status(409).json({ success: false, error: 'Custom code already in use' });
         }
-        
+    }
+        console.log("Custom code is available");
         // Calculate expiration time
 
         let expiresAt=null;
@@ -42,23 +45,23 @@ class urlController {
         // Get user IP address
         const userIp = req.ip || req.connection.remoteAddress;
 
-
+        console.log("User IP:", userIp);
         // Store in database
-        
+        console.log("Storing URL mapping in database...");
         const urlRecord = await dbService.createUrl(shortCode, longUrl, userIp, expiresAt);
-        
+        console.log("URL mapping stored:", urlRecord);
         // Cache in Redis
-
+        console.log("Caching URL in Redis...");
         await redisService.cacheUrl(shortCode, longUrl);
         await redisService.cacheMetadata(shortCode, {
         id: urlRecord.id,
         createdAt: urlRecord.created_at,
         expiresAt: urlRecord.expires_at
         });
-
+        console.log("URL cached in Redis");
         // Build short URL
         const shortUrl = `${process.env.BASE_URL}/${shortCode}`;
-        
+        console.log("Short URL created:", shortUrl);
         res.status(201).json({
             success: true,
             data: {
@@ -71,7 +74,7 @@ class urlController {
             expiresAt: urlRecord.expires_at
             }
         });
-        }} catch (error) {
+        } catch (error) {
             console.error('Create short URL error:', error);
             res.status(500).json({
                 success: false,
@@ -94,7 +97,7 @@ class urlController {
 
         if (!longUrl) {
             // If not in cache, get from database
-            const urlRecord = await dbService.getUrlByShortCode(shortCode);
+            const urlRecord = await dbService.getUrlbyShortCode(shortCode);
             
             if (!urlRecord) {
             return res.status(404).json({
@@ -145,7 +148,7 @@ class urlController {
         const offset = parseInt(req.query.offset) || 0;
 
         const urls = await dbService.getAllUrls(limit, offset);
-        const total = await dbService.getTotalCount();
+        const total = await dbService.getTotalUrlCount();
 
         res.json({
             success: true,
@@ -239,7 +242,8 @@ class urlController {
         });
         }
     }
-    }
+}
+    
 
 export default new urlController();
 
