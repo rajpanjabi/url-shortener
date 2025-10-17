@@ -1,0 +1,8 @@
+# frontend/.dockerignore
+node_modules
+dist
+build
+.git
+.env
+.DS_Store
+npm-debug.log

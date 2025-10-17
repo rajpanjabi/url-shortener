@@ -22,9 +22,9 @@ class urlController {
         console.log("Generated short code:", shortCode);
         // Validate custom code if provided
         if (customCode){
-            console.log("here")
+            
             if (customCode.length > 10 || customCode.length < 4){
-                console.log("here nested")
+                
                 return res.status(400).json({ success: false, error: 'Custom code must be between 4 and 10 characters' });
             }
         console.log("Custom code:", customCode);

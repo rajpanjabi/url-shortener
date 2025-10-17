@@ -21,17 +21,12 @@ const PORT = process.env.PORT || 5000;
 app.use(helmet());
 
 // CORS configuration
-
-
-// CORS configuration
 app.use(cors({
   origin: ['http://localhost:5173'], // allow Vite frontend
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
-
-
 
 // Body parser
 app.use(express.json());
@@ -46,7 +41,7 @@ const limiter = rateLimit({
   max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 100,
   message: 'Too many requests from this IP, please try again later'
 });
-// app.use('/api/', limiter);
+app.use('/api/', limiter);
 
 // Health check endpoint
 app.get('/health', (req, res) => {
