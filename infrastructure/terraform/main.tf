@@ -1,4 +1,6 @@
 # infrastructure/terraform/main.tf
+
+# Terraform configuration
 terraform {
   required_version = ">= 1.0"
   
@@ -8,22 +10,15 @@ terraform {
       version = "~> 5.0"
     }
   }
-
-  # Backend configuration for state management
-  backend "s3" {
-    bucket = "url-shortener-terraform-state"
-    key    = "prod/terraform.tfstate"
-    region = "us-east-1"
-    encrypt = true
-  }
 }
 
+# AWS Provider configuration
 provider "aws" {
   region = var.aws_region
   
   default_tags {
     tags = {
-      Project     = "url-shortener"
+      Project     = var.project_name
       Environment = var.environment
       ManagedBy   = "Terraform"
     }
