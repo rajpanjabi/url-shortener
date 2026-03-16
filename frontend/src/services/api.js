@@ -1,6 +1,8 @@
 import axios from 'axios';
 
-const API_URL = import.meta.env.REACT_APP_API_URL || 'http://localhost:8000/api';
+// VITE_API_BASE_URL is injected at Docker build time.
+// Falls back to relative /api so it works behind the ALB without hardcoding a domain.
+const API_URL = import.meta.env.VITE_API_BASE_URL || '/api';
 
 
 const apiClient = axios.create({

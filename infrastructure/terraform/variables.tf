@@ -37,6 +37,13 @@ variable "availability_zones" {
   default     = ["us-east-1a", "us-east-1b"]  # 2 zones for high availability
 }
 
+# Database Name
+variable "db_name" {
+  description = "Name of the PostgreSQL database"
+  type        = string
+  default     = "urlshortener"
+}
+
 # Database Username
 variable "db_username" {
   description = "Master username for RDS database"
