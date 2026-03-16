@@ -30,7 +30,7 @@ jobs:
       - run: npm run lint
 
   # ----------------------------------------
-  # Backend: install (no tests yet)
+  # Backend: install 
   # ----------------------------------------
   backend-install:
     name: Backend install
