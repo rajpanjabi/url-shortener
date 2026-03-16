@@ -13,7 +13,7 @@ const Analytics = () => {
     if (shortCode) {
       try {
         await dispatch(fetchAnalytics(shortCode));
-      } catch (_err) {
+      } catch {
         // Error handled by Redux
       }
     }

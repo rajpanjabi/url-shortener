@@ -22,7 +22,7 @@ const UrlList = () => {
     if (window.confirm('Are you sure you want to delete this URL?')) {
       try {
         await dispatch(deleteUrl(shortCode));
-      } catch (_err) {
+      } catch {
         alert('Failed to delete URL');
       }
     }

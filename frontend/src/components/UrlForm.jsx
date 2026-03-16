@@ -32,7 +32,7 @@ const UrlForm = () => {
         setExpiresIn('');
         
         setTimeout(() => setSuccessMessage(''), 5000);
-        } catch (_err) {
+        } catch {
         // Error is handled by Redux
         }
     };
